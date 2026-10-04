@@ -1,0 +1,42 @@
+import os
+import telebot
+import google.generativeai as genai
+
+# CONFIGURACIÓN DE LAS LLAVES SECRETAS
+TOKEN_TELEGRAM = os.environ.get("TOKEN_TELEGRAM")
+CLAVE_GEMINI = os.environ.get("CLAVE_GEMINI")
+ID_GRUPO_PERMITIDO = int(os.environ.get("ID_GRUPO_PERMITIDO", "0"))
+
+# Inicializar Telegram y Gemini
+bot = telebot.TeleBot(TOKEN_TELEGRAM)
+genai.configure(api_key=CLAVE_GEMINI)
+
+# Cargar el modelo rápido y eficiente de Gemini
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+@bot.message_handler(func=lambda message: True)
+def responder_grupo(message):
+    # SEGURIDAD: Solo responde si el mensaje viene de TU grupo exacto
+    if message.chat.id != ID_GRUPO_PERMITIDO:
+        return
+
+    # El bot responderá si lo mencionan por su nombre o si usan la palabra "bot"
+    texto_mensaje = message.text.lower()
+    if bot.get_me().username.lower() in texto_mensaje or "bot" in texto_mensaje:
+        
+        # Enviar señal de que el bot está escribiendo en el chat
+        bot.send_chat_action(message.chat.id, 'typing')
+        
+        try:
+            # Preguntar a Gemini usando las instrucciones y PDFs que configuraste
+            response = model.generate_content(
+                f"Basándote en el Estatuto y el Convenio de Pastelería de Valencia que tienes asignados, responde de forma clara a esta duda de un trabajador: {message.text}"
+            )
+            # Enviar la respuesta legal al grupo de Telegram
+            bot.reply_to(message, response.text)
+        except Exception as e:
+            bot.reply_to(message, "Lo siento, he tenido un pequeño problema al consultar los documentos legales. Inténtalo de nuevo en un momento.")
+
+# Mantener el bot escuchando 24/7
+if __name__ == "__main__":
+    bot.infinity_polling()
