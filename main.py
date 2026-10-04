@@ -24,7 +24,8 @@ bot = telebot.TeleBot(TOKEN_TELEGRAM)
 genai.configure(api_key=CLAVE_GEMINI)
 
 # Modelo hiperestable corregido sin errores tipográficos
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-1.5-flash-latest')
+
 
 @bot.message_handler(func=lambda message: True)
 def responder_grupo(message):
