@@ -23,8 +23,8 @@ ID_GRUPO_PERMITIDO = int(os.environ.get("ID_GRUPO_PERMITIDO", "0"))
 bot = telebot.TeleBot(TOKEN_TELEGRAM)
 genai.configure(api_key=CLAVE_GEMINI)
 
-# Cambiamos al modelo PRO, el más potente y con accesos abiertos libres de error 404
-model = genai.GenerativeModel('gemini-1.5-pro-latest')
+# MODELO MODERNO DE 2026 QUE EVITA EL ERROR 404 DE GOOGLE
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 @bot.message_handler(func=lambda message: True)
 def responder_grupo(message):
