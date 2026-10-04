@@ -23,18 +23,15 @@ ID_GRUPO_PERMITIDO = int(os.environ.get("ID_GRUPO_PERMITIDO", "0"))
 bot = telebot.TeleBot(TOKEN_TELEGRAM)
 genai.configure(api_key=CLAVE_GEMINI)
 
-# Modelo hiperestable corregido sin errores tipográficos
+# Nombre oficial e hiperestable de Google sin erratas
 model = genai.GenerativeModel('gemini-1.5-flash-latest')
-
 
 @bot.message_handler(func=lambda message: True)
 def responder_grupo(message):
-    # Filtro estricto de seguridad por ID de grupo
     if message.chat.id != ID_GRUPO_PERMITIDO:
         return
 
     texto_mensaje = message.text.lower()
-    # Reacciona si lo mencionan o si se incluye la palabra 'bot'
     if bot.get_me().username.lower() in texto_mensaje or "bot" in texto_mensaje:
         bot.send_chat_action(message.chat.id, 'typing')
         try:
@@ -48,7 +45,6 @@ def responder_grupo(message):
             response = model.generate_content(prompt_contexto)
             bot.reply_to(message, response.text)
         except Exception as e:
-            # Nos avisa en el chat si hay algún otro problema con la llave de Google
             bot.reply_to(message, f"Conexión establecida, pero Google AI Studio ha rechazado la consulta. Detalles: {str(e)[:50]}")
 
 if __name__ == "__main__":
